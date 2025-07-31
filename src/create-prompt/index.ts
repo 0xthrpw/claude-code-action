@@ -19,7 +19,6 @@ import {
 } from "../github/context";
 import type { ParsedGitHubContext } from "../github/context";
 import type { CommonFields, PreparedContext, EventData } from "./types";
-import { GITHUB_SERVER_URL } from "../github/api/config";
 import type { Mode, ModeContext } from "../modes/types";
 export type { CommonFields, PreparedContext } from "./types";
 
@@ -697,20 +696,16 @@ ${context.directPrompt ? `   - CRITICAL: Direct user instructions were provided 
       - Mark each subtask as completed as you progress.${getCommitInstructions(eventData, githubData, context, useCommitSigning)}
       ${
         eventData.claudeBranch
-          ? `- Provide a URL to create a PR manually in this format:
-        [Create a PR](${GITHUB_SERVER_URL}/${context.repository}/compare/${eventData.baseBranch}...<branch-name>?quick_pull=1&title=<url-encoded-title>&body=<url-encoded-body>)
-        - IMPORTANT: Use THREE dots (...) between branch names, not two (..)
-          Example: ${GITHUB_SERVER_URL}/${context.repository}/compare/main...feature-branch (correct)
-          NOT: ${GITHUB_SERVER_URL}/${context.repository}/compare/main..feature-branch (incorrect)
-        - IMPORTANT: Ensure all URL parameters are properly encoded - spaces should be encoded as %20, not left as spaces
-          Example: Instead of "fix: update welcome message", use "fix%3A%20update%20welcome%20message"
-        - The target-branch should be '${eventData.baseBranch}'.
-        - The branch-name is the current branch: ${eventData.claudeBranch}
+          ? `- Create a pull request directly using the gh CLI with this command:
+        \`gh pr create --base ${eventData.baseBranch} --title "<title>" --body "<body>"\`
+        - The title should be a clear, concise description of the changes made
         - The body should include:
           - A clear description of the changes
           - Reference to the original ${eventData.isPR ? "PR" : "issue"}
           - The signature: "Generated with [Claude Code](https://claude.ai/code)"
-        - Just include the markdown link with text "Create a PR" - do not add explanatory text before it like "You can create a PR using this link"`
+        - Example: \`gh pr create --base ${eventData.baseBranch} --title "Fix authentication bug in login flow" --body "This PR addresses the authentication issue reported in #123.\\n\\nChanges made:\\n- Fixed token validation logic\\n- Added proper error handling\\n- Updated tests\\n\\nGenerated with [Claude Code](https://claude.ai/code)"\`
+        - IMPORTANT: Make sure to escape quotes and newlines properly in the command
+        - Run this command after committing all your changes to create the PR automatically`
           : ""
       }
 

@@ -28,7 +28,7 @@ export const agentMode: Mode = {
   },
 
   getAllowedTools() {
-    return [];
+    return ["Bash(gh pr create *)"];
   },
 
   getDisallowedTools() {
