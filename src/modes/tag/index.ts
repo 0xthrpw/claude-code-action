@@ -40,7 +40,7 @@ export const tagMode: Mode = {
   },
 
   getAllowedTools() {
-    return ["Bash(gh pr create *)"];
+    return [];
   },
 
   getDisallowedTools() {

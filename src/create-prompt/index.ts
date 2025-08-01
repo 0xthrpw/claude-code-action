@@ -61,6 +61,7 @@ export function buildAllowedToolsString(
       "Bash(git rm:*)",
       "Bash(git config user.name:*)",
       "Bash(git config user.email:*)",
+      "Bash(gh pr create:*)",
     );
   }
 

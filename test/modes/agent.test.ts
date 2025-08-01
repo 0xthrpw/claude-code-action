@@ -18,7 +18,7 @@ describe("Agent Mode", () => {
       "Automation mode for workflow_dispatch and schedule events",
     );
     expect(agentMode.shouldCreateTrackingComment()).toBe(false);
-    expect(agentMode.getAllowedTools()).toEqual(["Bash(gh pr create *)"]);
+    expect(agentMode.getAllowedTools()).toEqual([]);
     expect(agentMode.getDisallowedTools()).toEqual([]);
   });
 

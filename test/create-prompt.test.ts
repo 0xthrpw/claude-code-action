@@ -194,9 +194,9 @@ describe("generatePrompt", () => {
       "<trigger_context>new issue with '@claude' in body</trigger_context>",
     );
     expect(prompt).toContain(
-      "[Create a PR](https://github.com/owner/repo/compare/main",
+      "gh pr create --base main",
     );
-    expect(prompt).toContain("The target-branch should be 'main'");
+    // Old target-branch reference removed since we now use gh pr create
   });
 
   test("should generate prompt for issue assigned event", () => {
@@ -222,7 +222,7 @@ describe("generatePrompt", () => {
       "<trigger_context>issue assigned to 'claude-bot'</trigger_context>",
     );
     expect(prompt).toContain(
-      "[Create a PR](https://github.com/owner/repo/compare/develop",
+      "gh pr create --base develop",
     );
   });
 
@@ -249,7 +249,7 @@ describe("generatePrompt", () => {
       "<trigger_context>issue labeled with 'claude-task'</trigger_context>",
     );
     expect(prompt).toContain(
-      "[Create a PR](https://github.com/owner/repo/compare/main",
+      "gh pr create --base main",
     );
   });
 
@@ -516,7 +516,7 @@ describe("generatePrompt", () => {
     expect(prompt).not.toContain(
       "IMPORTANT: You are already on the correct branch (",
     );
-    expect(prompt).not.toContain("Create a PR](https://github.com/");
+    expect(prompt).not.toContain("gh pr create --base");
   });
 
   test("should include Issue-specific instructions only for Issue events", () => {
@@ -543,10 +543,8 @@ describe("generatePrompt", () => {
     expect(prompt).toContain(
       "IMPORTANT: You are already on the correct branch (claude/issue-789-20240101-1200)",
     );
-    expect(prompt).toContain("Create a PR](https://github.com/");
-    expect(prompt).toContain(
-      "If you created anything in your branch, your comment must include the PR URL",
-    );
+    expect(prompt).toContain("gh pr create --base");
+    // Old PR URL requirement removed since we now use gh pr create
 
     // Should NOT contain PR-specific instructions
     expect(prompt).not.toContain(
@@ -582,9 +580,7 @@ describe("generatePrompt", () => {
     expect(prompt).toContain(
       "IMPORTANT: You are already on the correct branch (claude/issue-123-20240101-1200)",
     );
-    expect(prompt).toContain(
-      "The branch-name is the current branch: claude/issue-123-20240101-1200",
-    );
+    // Old branch-name reference removed since we now use gh pr create
   });
 
   test("should handle closed PR with new branch", () => {
@@ -610,15 +606,11 @@ describe("generatePrompt", () => {
       "You are already on the correct branch (claude/pr-456-20240101-1200)",
     );
     expect(prompt).toContain(
-      "Create a PR](https://github.com/owner/repo/compare/main",
+      "gh pr create --base main",
     );
-    expect(prompt).toContain(
-      "The branch-name is the current branch: claude/pr-456-20240101-1200",
-    );
+    // Old branch-name reference removed since we now use gh pr create
     expect(prompt).toContain("Reference to the original PR");
-    expect(prompt).toContain(
-      "If you created anything in your branch, your comment must include the PR URL",
-    );
+    // Old PR URL requirement removed since we now use gh pr create
 
     // Should NOT contain open PR instructions
     expect(prompt).not.toContain(
@@ -650,7 +642,7 @@ describe("generatePrompt", () => {
     );
 
     // Should NOT contain new branch instructions
-    expect(prompt).not.toContain("Create a PR](https://github.com/");
+    expect(prompt).not.toContain("gh pr create --base");
     expect(prompt).not.toContain("You are already on the correct branch");
     expect(prompt).not.toContain(
       "If you created anything in your branch, your comment must include the PR URL",
@@ -679,7 +671,7 @@ describe("generatePrompt", () => {
       "You are already on the correct branch (claude/pr-789-20240101-1230)",
     );
     expect(prompt).toContain(
-      "Create a PR](https://github.com/owner/repo/compare/develop",
+      "gh pr create --base develop",
     );
     expect(prompt).toContain("Reference to the original PR");
   });
@@ -706,11 +698,9 @@ describe("generatePrompt", () => {
     expect(prompt).toContain(
       "You are already on the correct branch (claude/pr-999-20240101-1400)",
     );
-    expect(prompt).toContain("Create a PR](https://github.com/");
+    expect(prompt).toContain("gh pr create --base");
     expect(prompt).toContain("Reference to the original PR");
-    expect(prompt).toContain(
-      "If you created anything in your branch, your comment must include the PR URL",
-    );
+    // Old PR URL requirement removed since we now use gh pr create
   });
 
   test("should handle pull_request event on closed PR with new branch", () => {
@@ -734,7 +724,7 @@ describe("generatePrompt", () => {
     expect(prompt).toContain(
       "You are already on the correct branch (claude/pr-555-20240101-1500)",
     );
-    expect(prompt).toContain("Create a PR](https://github.com/");
+    expect(prompt).toContain("gh pr create --base");
     expect(prompt).toContain("Reference to the original PR");
   });
 
@@ -898,6 +888,7 @@ describe("buildAllowedToolsString", () => {
     expect(result).toContain("Bash(git add:*)");
     expect(result).toContain("Bash(git commit:*)");
     expect(result).toContain("Bash(git push:*)");
+    expect(result).toContain("Bash(gh pr create:*)");
     expect(result).toContain("mcp__github_comment__update_claude_comment");
 
     // Should not have commit signing tools
@@ -919,6 +910,7 @@ describe("buildAllowedToolsString", () => {
     // Should have specific Bash git commands for non-signing mode
     expect(result).toContain("Bash(git add:*)");
     expect(result).toContain("Bash(git commit:*)");
+    expect(result).toContain("Bash(gh pr create:*)");
     expect(result).toContain("mcp__github_comment__update_claude_comment");
 
     // Should not have commit signing tools
@@ -1019,6 +1011,7 @@ describe("buildAllowedToolsString", () => {
     expect(result).toContain("Bash(git rm:*)");
     expect(result).toContain("Bash(git config user.name:*)");
     expect(result).toContain("Bash(git config user.email:*)");
+    expect(result).toContain("Bash(gh pr create:*)");
 
     // Comment tool from minimal server should be included
     expect(result).toContain("mcp__github_comment__update_claude_comment");
@@ -1035,6 +1028,7 @@ describe("buildAllowedToolsString", () => {
     // Base tools should be present
     expect(result).toContain("Edit");
     expect(result).toContain("Bash(git add:*)");
+    expect(result).toContain("Bash(gh pr create:*)");
 
     // Custom tools should be included
     expect(result).toContain("CustomTool1");

@@ -82,8 +82,8 @@ describe("Tag Mode", () => {
     expect(context.claudeBranch).toBeUndefined();
   });
 
-  test("getAllowedTools returns gh pr create command", () => {
-    expect(tagMode.getAllowedTools()).toEqual(["Bash(gh pr create *)"]);
+  test("getAllowedTools returns empty array", () => {
+    expect(tagMode.getAllowedTools()).toEqual([]);
   });
 
   test("getDisallowedTools returns empty array", () => {
